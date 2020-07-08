@@ -1,0 +1,220 @@
+---
+title: "Data Visualization"
+author: "Michael Goulet"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Prerequisites
+
+
+```{r, message = FALSE}
+library(tidyverse)
+```
+
+
+## First Steps
+
+```{r}
+mpg
+```
+### Creating a ggplot
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy))
+```
+```{r}
+ggplot(data = mpg)
+```
+
+```{r}
+dim(mpg)
+```
+
+```{r}
+# ?mpg
+# `drv` is a factor of the drive train with 3 levels
+```
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = cyl, y = hwy))
+```
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = drv, y = class))
+
+# Because the two variables are both categorical, the points will all overlap. We cannot get a sense of how many 4 wheel drive SUVs there are, for instance. 
+```
+## Aesthetic Mappings 
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy, color = class))
+```
+### Exercises 
+```{r}
+# To set an aesthetic manually, assign it outside of the mapping
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy), color = "blue", shape = 10)
+```
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy, color = "blue"))
+# Why isn't this blue? See above.
+```
+
+The categorical variables are `manufacturer`, `model`, `trans`, `drv`, `fl`, and `class`. The remaining are continuous.
+
+```{r}
+# mapping a continuous variable to color, size, and shape 
+# NOTE: shape cannot be mapped to a continuous variable
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = cty, color = hwy, alpha = hwy, shape = fl), stroke = 0.2, size = 4)
+```
+```{r}
+## Creating a custom shape by layering points of different properties
+ggplot(data = mpg, mapping = aes(x = displ, y = cty)) +
+  geom_point(colour = "black", size = 4.5) +
+  geom_point(colour = "grey", size = 4) +
+  geom_point(mapping = aes(shape = factor(cyl), color = cyl == 8))
+```
+
+
+## Common Problems 
+
+Type carefully!
+
+## Facets 
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_wrap(~ class, nrow = 2)
+```
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_grid(fl ~ cyl)
+```
+
+### Exercises
+
+```{r}
+ggplot(data = mpg) +
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_wrap(~ cty)
+```
+
+#### Facets with empty panels
+
+Certain panels are empty, because there are no observations that have, for example, `drv == 4` and `cyl == 5`. 
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = drv, y = cyl)) +
+  facet_grid(cyl ~ drv)
+```
+
+### Exercises (cont.)
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_grid(drv ~ .)
+```
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_grid(. ~ cyl)
+```
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) +
+  facet_grid( ~ cyl)
+```
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy)) + 
+  facet_grid(cyl ~ class)
+```
+
+## Geometric Objects
+
+```{r}
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv))
+```
+
+```{r}
+ggplot(data = mpg) + 
+  geom_smooth(mapping = aes(x = displ, y = hwy, color = drv))
+```
+### Exercises
+
+Recreating graphs.
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+```
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point() +
+  geom_smooth(mapping = aes(group = drv), se = FALSE)
+```
+
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+```
+
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point(mapping = aes(color = drv)) +
+  geom_smooth(se = FALSE)
+```
+
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point(mapping = aes(color = drv)) +
+  geom_smooth(mapping = aes(linetype = drv),se = FALSE)
+```
+
+```{r}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+  geom_point(color = "white", size = 4) +
+  geom_point(mapping = aes(color = drv))
+```
+
+## Statistical Transformations 
+
+
+
+## Playing Around
+```{r}
+
+# truncate_dups <- function(s) {
+#   return(gsub("\\s[12]$", "", s))
+# }
+# 
+# ccn1 <- .GlobalEnv$ccn1_tibble
+# ccn1$Treatments <- truncate_dups(ccn1$Sample.Name)
+# ggplot(data = ccn1) +
+#   geom_point(mapping = aes(x = Treatments, y = Rq))
+```
+
